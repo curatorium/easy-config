@@ -10,6 +10,7 @@ use Twig\Extension\DebugExtension;
 use Twig\Lexer;
 use Twig\Loader\FilesystemLoader as Loader;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 use Twig\TwigTest;
 
 class Writer
@@ -35,6 +36,9 @@ class Writer
         $twig->setLexer(new Lexer($twig, ['tag_variable' => ['${', '}']]));
 
         $twig->addFilter(new TwigFilter('filter', 'array_filter'));
+
+        // Read a runtime environment variable, with an optional fallback when unset.
+        $twig->addFunction(new TwigFunction('env', fn ($name, $default = null) => getenv($name) !== false ? getenv($name) : $default));
 
         $twig->addFilter(new TwigFilter('b64', fn ($data) => base64_encode(!is_scalar($data) ? json_encode($data) : $data)));
         $twig->addFilter(new TwigFilter('json', fn ($object) => json_encode($object, JSON_UNESCAPED_SLASHES)));
